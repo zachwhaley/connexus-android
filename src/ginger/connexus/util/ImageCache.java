@@ -17,6 +17,7 @@
 package ginger.connexus.util;
 
 import ginger.connexus.BuildConfig;
+import ginger.connexus.ui.RecyclingBitmapDrawable;
 
 import java.io.File;
 import java.io.FileDescriptor;

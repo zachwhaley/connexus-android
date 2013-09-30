@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ginger.connexus.util;
+package ginger.connexus.ui;
 
 import ginger.connexus.BuildConfig;
 import android.content.res.Resources;

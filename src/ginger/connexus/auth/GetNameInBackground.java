@@ -20,6 +20,7 @@ import ginger.connexus.activity.BaseActivity;
 
 import java.io.IOException;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +38,7 @@ import com.google.android.gms.auth.UserRecoverableNotifiedException;
  */
 public class GetNameInBackground extends AbstractGetNameTask {
 
-    public GetNameInBackground(BaseActivity activity, String email, String scope, int requestCode) {
+    public GetNameInBackground(Activity activity, String email, String scope, int requestCode) {
         super(activity, email, scope, requestCode);
     }
 

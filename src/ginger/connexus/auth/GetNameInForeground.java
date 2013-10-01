@@ -16,9 +16,9 @@
 
 package ginger.connexus.auth;
 
-import ginger.connexus.activity.BaseActivity;
-
 import java.io.IOException;
+
+import android.app.Activity;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -31,7 +31,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
  */
 public class GetNameInForeground extends AbstractGetNameTask {
 
-    public GetNameInForeground(BaseActivity activity, String email, String scope, int requestCode) {
+    public GetNameInForeground(Activity activity, String email, String scope, int requestCode) {
         super(activity, email, scope, requestCode);
     }
 

@@ -16,8 +16,6 @@
 
 package ginger.connexus.auth;
 
-import ginger.connexus.activity.BaseActivity;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +24,7 @@ import java.net.URL;
 
 import org.json.JSONException;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -37,13 +36,13 @@ import com.google.android.gms.auth.GoogleAuthUtil;
  */
 public abstract class AbstractGetNameTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "TokenInfoTask";
-    protected BaseActivity mActivity;
+    protected Activity mActivity;
 
     protected String mScope;
     protected String mEmail;
     protected int mRequestCode;
 
-    AbstractGetNameTask(BaseActivity activity, String email, String scope, int requestCode) {
+    AbstractGetNameTask(Activity activity, String email, String scope, int requestCode) {
         this.mActivity = activity;
         this.mScope = scope;
         this.mEmail = email;

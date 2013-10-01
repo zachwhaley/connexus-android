@@ -1,6 +1,6 @@
 package ginger.connexus.activity;
 
-import android.content.Intent;
+import ginger.connexus.util.AccountUtils;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -9,9 +9,9 @@ public class BaseActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO check for authentication
-        final Intent intent = new Intent(this, AuthActivity.class);
-        startActivity(intent);
+        if (!AccountUtils.isAuthenticated(this)) {
+            AccountUtils.startAuthenticationFlow(this, getIntent());
+        }
     }
 
 }

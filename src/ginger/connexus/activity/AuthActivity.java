@@ -1,25 +1,37 @@
 package ginger.connexus.activity;
 
 import ginger.connexus.R;
-import ginger.connexus.auth.GetNameInForeground;
-import ginger.connexus.fragment.AccountChooserFragment;
+import ginger.connexus.fragment.ChooseAccountFragment;
+import ginger.connexus.util.AccountUtils;
+import ginger.connexus.util.AccountUtils.AuthenticateCallback;
+import android.accounts.Account;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
-public class AuthActivity extends FragmentActivity implements AccountChooserFragment.AccountChooserListener {
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
-    private static final String SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile";
+public class AuthActivity extends FragmentActivity implements ChooseAccountFragment.AccountChooserListener,
+        AuthenticateCallback {
+
+    private static final String TAG = AuthActivity.class.toString();
+    private static final String KEY_CHOSEN_ACCOUNT = "chosen_account";
     private static final String CHOOSE_ACCOUNT_TAG = "account_chooser";
+    private static final String POST_AUTH_CATEGORY = "ginger.connexus.category.POST_AUTH";
+    private static final int REQUEST_RECOVER_FROM_AUTH_ERROR = 101;
+    private static final int REQUEST_RECOVER_FROM_PLAY_SERVICES_ERROR = 102;
 
-    static final int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR = 1001;
-    static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
+    public static final String EXTRA_FINISH_INTENT = "ginger.connexus.extra.FINISH_INTENT";
 
-    private String mEmail;
+    private Account mChosenAccount;
+    private Intent mFinishIntent;
+    private boolean mCancelAuth = false;
+    private boolean mAuthInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +40,19 @@ public class AuthActivity extends FragmentActivity implements AccountChooserFrag
         setContentView(R.layout.activity_auth);
         setTitle("Sign in");
         createSignInButton();
+
+        final Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_FINISH_INTENT)) {
+            mFinishIntent = intent.getParcelableExtra(EXTRA_FINISH_INTENT);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthInProgress) {
+            mCancelAuth = true;
+        }
     }
 
     private void createSignInButton() {
@@ -36,39 +61,59 @@ public class AuthActivity extends FragmentActivity implements AccountChooserFrag
 
             @Override
             public void onClick(View v) {
-                AccountChooserFragment.newInstance(AuthActivity.this)
+                ChooseAccountFragment.newInstance(AuthActivity.this)
                         .show(getSupportFragmentManager(), CHOOSE_ACCOUNT_TAG);
             }
         });
     }
 
     @Override
-    public void onAccountChosen(String accountEmail) {
-        new GetNameInForeground(AuthActivity.this, accountEmail, SCOPE, REQUEST_CODE_RECOVER_FROM_AUTH_ERROR).execute();
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mChosenAccount != null)
+            outState.putString(KEY_CHOSEN_ACCOUNT, mChosenAccount.name);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_RECOVER_FROM_AUTH_ERROR) {
-            handleAuthorizeResult(resultCode, data);
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onAccountChosen(final Account account) {
+        mChosenAccount = account;
+        mAuthInProgress = true;
+        AccountUtils.tryAuthenticate(this, this, mChosenAccount.name, REQUEST_RECOVER_FROM_AUTH_ERROR);
     }
 
-    private void handleAuthorizeResult(int resultCode, Intent data) {
-        if (data == null) {
-            Toast.makeText(this, "Unknown sign in error", Toast.LENGTH_SHORT).show();
-            return;
+    @Override
+    public boolean shouldCancelAuthentication() {
+        return mCancelAuth;
+    }
+
+    @Override
+    public void onAuthTokenAvailable() {
+        mAuthInProgress = false;
+        if (mFinishIntent != null) {
+            // Ensure the finish intent is unique within the task. Otherwise, if
+            // the task was started with this intent, and it finishes like it
+            // should, then startActivity on the intent again won't work.
+            mFinishIntent.addCategory(POST_AUTH_CATEGORY);
+            startActivity(mFinishIntent);
         }
-        if (resultCode == RESULT_OK) {
-            new GetNameInForeground(AuthActivity.this, mEmail, SCOPE, REQUEST_CODE_RECOVER_FROM_AUTH_ERROR).execute();
-            return;
-        }
-        if (resultCode == RESULT_CANCELED) {
-            return;
-        }
-        Toast.makeText(this, "Unknown sign in error", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @Override
+    public void onRecoverableException(final int code) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final Dialog d = GooglePlayServicesUtil.getErrorDialog(code, AuthActivity.this,
+                        REQUEST_RECOVER_FROM_PLAY_SERVICES_ERROR);
+                d.show();
+            }
+        });
+    }
+
+    @Override
+    public void onUnRecoverableException(final String errorMessage) {
+        Log.w(TAG, "Encountered unrecoverable exception: " + errorMessage);
     }
 
 }

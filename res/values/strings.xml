@@ -27,5 +27,6 @@
     <string name="title_subscriptions">Subscriptions</string>
     <string name="title_mine">Mine</string>
     <string name="title_nearby">Nearby</string>
+    <string name="choose_account_text">Sign in as</string>
 
 </resources>

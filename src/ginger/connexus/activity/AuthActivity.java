@@ -45,6 +45,17 @@ public class AuthActivity extends FragmentActivity implements ChooseAccountFragm
         if (intent.hasExtra(EXTRA_FINISH_INTENT)) {
             mFinishIntent = intent.getParcelableExtra(EXTRA_FINISH_INTENT);
         }
+
+        if (savedInstanceState == null) {
+            if (AccountUtils.isAuthenticated(this)) {
+                mChosenAccount = new Account(AccountUtils.getChosenAccountName(this), "com.google");
+            }
+        } else {
+            String accountName = savedInstanceState.getString(KEY_CHOSEN_ACCOUNT);
+            if (accountName != null) {
+                mChosenAccount = new Account(accountName, "com.google");
+            }
+        }
     }
 
     @Override

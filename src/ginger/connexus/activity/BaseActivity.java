@@ -11,6 +11,7 @@ public class BaseActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         if (!AccountUtils.isAuthenticated(this)) {
             AccountUtils.startAuthenticationFlow(this, getIntent());
+            finish();
         }
     }
 

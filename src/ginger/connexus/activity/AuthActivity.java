@@ -16,7 +16,7 @@ import android.widget.Button;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class AuthActivity extends FragmentActivity implements ChooseAccountFragment.AccountChooserListener,
+public class AuthActivity extends FragmentActivity implements ChooseAccountFragment.ChooseAccountListener,
         AuthenticateCallback {
 
     private static final String TAG = AuthActivity.class.toString();

@@ -15,17 +15,17 @@ import android.support.v4.app.DialogFragment;
 
 public class ChooseAccountFragment extends DialogFragment {
 
-    public interface AccountChooserListener {
+    public interface ChooseAccountListener {
         public void onAccountChosen(final Account accountEmail);
     }
 
-    private AccountChooserListener mListener;
+    private ChooseAccountListener mListener;
     private List<Account> mAccounts;
 
     public ChooseAccountFragment() {
     }
 
-    public static ChooseAccountFragment newInstance(AccountChooserListener listener) {
+    public static ChooseAccountFragment newInstance(ChooseAccountListener listener) {
         ChooseAccountFragment accountChooser = new ChooseAccountFragment();
         accountChooser.mListener = listener;
         return accountChooser;

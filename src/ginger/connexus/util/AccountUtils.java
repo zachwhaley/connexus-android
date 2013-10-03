@@ -68,6 +68,7 @@ public final class AccountUtils {
                 // Persists auth token.
                 setAuthToken(mActivity, token);
                 setChosenAccountName(mActivity, mAccountName);
+                mCallback.onAuthTokenAvailable();
                 return token;
             } catch (GooglePlayServicesAvailabilityException e) {
                 mCallback.onRecoverableException(e.getConnectionStatusCode());
@@ -84,12 +85,6 @@ public final class AccountUtils {
                 mCallback.onUnRecoverableException(e.getMessage());
             }
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(String token) {
-            super.onPostExecute(token);
-            mCallback.onAuthTokenAvailable();
         }
     }
 

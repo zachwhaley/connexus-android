@@ -1,6 +1,7 @@
 package ginger.connexus.activity;
 
 import ginger.connexus.R;
+import ginger.connexus.fragment.GridFragment;
 import ginger.connexus.fragment.StreamGridFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,6 +41,15 @@ public class MainActivity extends BaseActivity {
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 
+	/*
+	 * Called when the Activity becomes visible.
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		startLocationClient();
+	}
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -54,7 +64,8 @@ public class MainActivity extends BaseActivity {
 		public Fragment getItem(int position) {
 			Intent intent = new Intent(MainActivity.this, ImageGridActivity.class);
 			Bundle arguments = new Bundle();
-			arguments.putInt(StreamGridFragment.REQUEST, position);
+			arguments.putInt(GridFragment.REQUEST, position);
+			arguments.putParcelable(GridFragment.LOCATION, getLocation());
 			return StreamGridFragment.newInstance(intent, arguments);
 		}
 

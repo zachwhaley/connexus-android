@@ -1,5 +1,6 @@
 package ginger.connexus.fragment;
 
+import ginger.connexus.BuildConfig;
 import ginger.connexus.model.ConnexusStream;
 import ginger.connexus.network.ConnexusApi;
 import ginger.connexus.network.RequestAllStreams;
@@ -12,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -43,7 +46,12 @@ public class StreamGridFragment extends GridFragment {
 	}
 
 	@Override
-	protected void reloadFromArguments(Bundle arguments) {
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		reloadFromArguments(getArguments());
+	}
+
+	private void reloadFromArguments(Bundle arguments) {
 		mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
 		final int request = arguments.getInt(REQUEST, -1);
 		switch (request) {
@@ -59,6 +67,13 @@ public class StreamGridFragment extends GridFragment {
 				break;
 			}
 			case REQUEST_NEARBY:
+				Location location = (Location) arguments.getParcelable(LOCATION);
+				// TODO Remove
+				if (BuildConfig.DEBUG) {
+					double lat = location.getLatitude();
+					double lon = location.getLongitude();
+					Toast.makeText(getActivity(), "Latitude " + lat + " Longitude " + lon, Toast.LENGTH_LONG).show();
+				}
 				mStreamRequest = new RequestNearbyStreams();
 				break;
 			default:
@@ -84,7 +99,7 @@ public class StreamGridFragment extends GridFragment {
 			for (ConnexusStream stream : result) {
 				imageUrls.add(stream.cover);
 			}
-			reloadImages(imageUrls);
+			StreamGridFragment.this.reloadImages(imageUrls);
 		}
 	}
 

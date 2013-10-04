@@ -23,5 +23,11 @@
         android:icon="@android:drawable/ic_menu_delete"
         android:showAsAction="never"
         android:title="@string/logout_menu"/>
+    
+    <item
+        android:id="@+id/takepic"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="never"
+        android:title="@string/takepic_menu"/>
         
 </menu>

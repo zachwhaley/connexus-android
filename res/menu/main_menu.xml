@@ -26,8 +26,8 @@
     
     <item
         android:id="@+id/takepic"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:showAsAction="never"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:showAsAction="ifRoom"
         android:title="@string/takepic_menu"/>
         
 </menu>

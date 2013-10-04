@@ -228,25 +228,20 @@ public class BaseActivity extends FragmentActivity implements
                 AccountUtils.startAuthenticationFlow(this, getIntent());
                 return true;
             case R.id.takepic:
-                // create Intent to take a picture and return control to the
-                // calling application
+                // create Intent to take a picture and return control to the calling application
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a
-                                                                   // file to
-                                                                   // save the
-                                                                   // image
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
-                                                                   // image file
-                                                                   // name
+                // create a file to save the image
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                // set the image file name
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
                 // start the image capture Intent
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 return true;
 
             default:
-                // return super.onOptionsItemSelected(item);
-                return true;
+                return super.onOptionsItemSelected(item);
 
         }
 

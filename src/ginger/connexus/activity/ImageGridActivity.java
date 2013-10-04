@@ -28,20 +28,20 @@ import android.support.v4.app.FragmentTransaction;
  * much else.
  */
 public class ImageGridActivity extends BaseActivity {
-	private static final String TAG = "ImageGridActivity";
+    private static final String TAG = "ImageGridActivity";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		if (BuildConfig.DEBUG) {
-			Utils.enableStrictMode();
-		}
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (BuildConfig.DEBUG) {
+            Utils.enableStrictMode();
+        }
+        super.onCreate(savedInstanceState);
 
-		if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
-			final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			Intent intent = new Intent(this, ImageDetailActivity.class);
-			ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, new Bundle()), TAG);
-			ft.commit();
-		}
-	}
+        if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Intent intent = new Intent(this, ImageDetailActivity.class);
+            ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, new Bundle()), TAG);
+            ft.commit();
+        }
+    }
 }

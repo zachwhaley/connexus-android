@@ -23,84 +23,84 @@ import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 public class StreamGridFragment extends GridFragment {
 
-	private static final String TAG = StreamGridFragment.class.toString();
+    private static final String TAG = StreamGridFragment.class.toString();
 
-	public static final int REQUEST_ALL = 0;
-	public static final int REQUEST_SUBSCRIBED = 1;
-	public static final int REQUEST_USER = 2;
-	public static final int REQUEST_NEARBY = 3;
+    public static final int REQUEST_ALL = 0;
+    public static final int REQUEST_SUBSCRIBED = 1;
+    public static final int REQUEST_USER = 2;
+    public static final int REQUEST_NEARBY = 3;
 
-	private RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> mStreamRequest;
+    private RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> mStreamRequest;
 
-	/**
-	 * Empty constructor as per the Fragment documentation
-	 */
-	public StreamGridFragment() {
-	}
+    /**
+     * Empty constructor as per the Fragment documentation
+     */
+    public StreamGridFragment() {
+    }
 
-	public static StreamGridFragment newInstance(final Intent intent, Bundle arguments) {
-		StreamGridFragment fragment = new StreamGridFragment();
-		arguments.putParcelable(FORWARD_INTENT, intent);
-		fragment.setArguments(arguments);
-		return fragment;
-	}
+    public static StreamGridFragment newInstance(final Intent intent, Bundle arguments) {
+        StreamGridFragment fragment = new StreamGridFragment();
+        arguments.putParcelable(FORWARD_INTENT, intent);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		reloadFromArguments(getArguments());
-	}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        reloadFromArguments(getArguments());
+    }
 
-	private void reloadFromArguments(Bundle arguments) {
-		mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
-		final int request = arguments.getInt(REQUEST, -1);
-		switch (request) {
-			case REQUEST_ALL:
-				mStreamRequest = new RequestAllStreams();
-				break;
-			case REQUEST_SUBSCRIBED: {
-				mStreamRequest = new RequestSubscribedStreams();
-				break;
-			}
-			case REQUEST_USER: {
-				mStreamRequest = new RequestUserStreams();
-				break;
-			}
-			case REQUEST_NEARBY:
-				Location location = (Location) arguments.getParcelable(LOCATION);
-				// TODO Remove
-				if (BuildConfig.DEBUG) {
-					double lat = location.getLatitude();
-					double lon = location.getLongitude();
-					Toast.makeText(getActivity(), "Latitude " + lat + " Longitude " + lon, Toast.LENGTH_LONG).show();
-				}
-				mStreamRequest = new RequestNearbyStreams();
-				break;
-			default:
-				throw new UnsupportedOperationException(TAG);
-		}
+    private void reloadFromArguments(Bundle arguments) {
+        mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
+        final int request = arguments.getInt(REQUEST, -1);
+        switch (request) {
+            case REQUEST_ALL:
+                mStreamRequest = new RequestAllStreams();
+                break;
+            case REQUEST_SUBSCRIBED: {
+                mStreamRequest = new RequestSubscribedStreams();
+                break;
+            }
+            case REQUEST_USER: {
+                mStreamRequest = new RequestUserStreams();
+                break;
+            }
+            case REQUEST_NEARBY:
+                Location location = (Location) arguments.getParcelable(LOCATION);
+                // TODO Remove
+                if (BuildConfig.DEBUG) {
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    Toast.makeText(getActivity(), "Latitude " + lat + " Longitude " + lon, Toast.LENGTH_LONG).show();
+                }
+                mStreamRequest = new RequestNearbyStreams();
+                break;
+            default:
+                throw new UnsupportedOperationException(TAG);
+        }
 
-		// TODO temporary
-		reloadImages(Arrays.asList(Images.imageThumbUrls));
-		// getSpiceManager().execute(mStreamRequest, new
-		// ConnexusStreamRequestListener());
-	}
+        // TODO temporary
+        reloadImages(Arrays.asList(Images.imageThumbUrls));
+        // getSpiceManager().execute(mStreamRequest, new
+        // ConnexusStreamRequestListener());
+    }
 
-	public final class ConnexusStreamRequestListener implements RequestListener<ConnexusStream.List> {
+    public final class ConnexusStreamRequestListener implements RequestListener<ConnexusStream.List> {
 
-		@Override
-		public void onRequestFailure(SpiceException spiceException) {
-			// TODO failure
-		}
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            // TODO failure
+        }
 
-		@Override
-		public void onRequestSuccess(final ConnexusStream.List result) {
-			ArrayList<String> imageUrls = new ArrayList<String>(result.size());
-			for (ConnexusStream stream : result) {
-				imageUrls.add(stream.cover);
-			}
-			StreamGridFragment.this.reloadImages(imageUrls);
-		}
-	}
+        @Override
+        public void onRequestSuccess(final ConnexusStream.List result) {
+            ArrayList<String> imageUrls = new ArrayList<String>(result.size());
+            for (ConnexusStream stream : result) {
+                imageUrls.add(stream.cover);
+            }
+            StreamGridFragment.this.reloadImages(imageUrls);
+        }
+    }
 
 }

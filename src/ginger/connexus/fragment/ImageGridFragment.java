@@ -39,56 +39,56 @@ import com.octo.android.robospice.request.listener.RequestListener;
  */
 public class ImageGridFragment extends GridFragment {
 
-	private static final String TAG = ImageGridFragment.class.toString();
+    private static final String TAG = ImageGridFragment.class.toString();
 
-	private RequestStreamImages mImageRequest;
+    private RequestStreamImages mImageRequest;
 
-	/**
-	 * Empty constructor as per the Fragment documentation
-	 */
-	public ImageGridFragment() {
-	}
+    /**
+     * Empty constructor as per the Fragment documentation
+     */
+    public ImageGridFragment() {
+    }
 
-	public static ImageGridFragment newInstance(final Intent intent, Bundle arguments) {
-		ImageGridFragment fragment = new ImageGridFragment();
-		arguments.putParcelable(FORWARD_INTENT, intent);
-		fragment.setArguments(arguments);
-		return fragment;
-	}
+    public static ImageGridFragment newInstance(final Intent intent, Bundle arguments) {
+        ImageGridFragment fragment = new ImageGridFragment();
+        arguments.putParcelable(FORWARD_INTENT, intent);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		reloadFromArguments(getArguments());
-	}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        reloadFromArguments(getArguments());
+    }
 
-	private void reloadFromArguments(Bundle arguments) {
-		mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
+    private void reloadFromArguments(Bundle arguments) {
+        mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
 
-		mImageRequest = new RequestStreamImages();
+        mImageRequest = new RequestStreamImages();
 
-		// TODO temporary
-		reloadImages(Arrays.asList(Images.imageThumbUrls));
+        // TODO temporary
+        reloadImages(Arrays.asList(Images.imageThumbUrls));
 
-		// getSpiceManager().execute(mImageRequest, new
-		// ConnexusImageRequestListener());
-	}
+        // getSpiceManager().execute(mImageRequest, new
+        // ConnexusImageRequestListener());
+    }
 
-	public final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {
+    public final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {
 
-		@Override
-		public void onRequestFailure(SpiceException spiceException) {
-			// TODO failure
-		}
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            // TODO failure
+        }
 
-		@Override
-		public void onRequestSuccess(final ConnexusImage.List result) {
-			ArrayList<String> imageUrls = new ArrayList<String>(result.size());
-			for (ConnexusImage image : result) {
-				imageUrls.add(image.link);
-			}
-			ImageGridFragment.this.reloadImages(imageUrls);
-		}
-	}
+        @Override
+        public void onRequestSuccess(final ConnexusImage.List result) {
+            ArrayList<String> imageUrls = new ArrayList<String>(result.size());
+            for (ConnexusImage image : result) {
+                imageUrls.add(image.link);
+            }
+            ImageGridFragment.this.reloadImages(imageUrls);
+        }
+    }
 
 }

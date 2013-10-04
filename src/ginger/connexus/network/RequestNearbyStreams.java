@@ -1,12 +1,18 @@
 package ginger.connexus.network;
 
-import ginger.connexus.model.ImageWrapper;
+import ginger.connexus.model.ConnexusStream;
 
-public class RequestNearbyStreams extends BaseRequestStream {
+import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
-    @Override
-    public ImageWrapper.List loadDataFromNetwork() throws Exception {
-        return getService().nearbyStreams();
-    }
+public class RequestNearbyStreams extends RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> {
+
+	public RequestNearbyStreams() {
+		super(ConnexusStream.List.class, ConnexusApi.class);
+	}
+
+	@Override
+	public ConnexusStream.List loadDataFromNetwork() throws Exception {
+		return getService().nearbyStreams();
+	}
 
 }

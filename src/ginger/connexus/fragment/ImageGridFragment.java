@@ -34,14 +34,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 /**
  * The main fragment that powers the ImageGridActivity screen. Fairly straight
@@ -197,16 +195,7 @@ public class ImageGridFragment extends SpiceFragment implements AdapterView.OnIt
         inflater.inflate(R.menu.main_menu, menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.clear_cache:
-            mImageFetcher.clearCache();
-            Toast.makeText(getActivity(), R.string.clear_cache_complete_toast, Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
 
     private void reloadFromArguments(Bundle arguments) {
         // Tear down from previous arguments

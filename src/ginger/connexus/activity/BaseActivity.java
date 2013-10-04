@@ -92,8 +92,7 @@ public class BaseActivity extends FragmentActivity {
         	return true;
         	
     	default:
-            //return super.onOptionsItemSelected(item);
-    		return true;
+            return super.onOptionsItemSelected(item);
 
         }
         

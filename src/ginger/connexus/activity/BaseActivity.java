@@ -1,9 +1,5 @@
 package ginger.connexus.activity;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import ginger.connexus.R;
 import ginger.connexus.util.AccountUtils;
 
@@ -11,6 +7,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -70,17 +67,19 @@ public class BaseActivity extends FragmentActivity implements
     }
 
     /** Create a File for saving an image or video */
+    @SuppressLint("SimpleDateFormat")
     private static File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Connexus");
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "Connexus");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()){
-            if (!mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("Connexus", "failed to create directory");
                 return null;
             }
@@ -131,27 +130,6 @@ public class BaseActivity extends FragmentActivity implements
     @Override
     public void onDisconnected() {
         mConnected = false;
-    }
-
-    /*
-     * Handle results returned to the FragmentActivity by Google Play services
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
-                /*
-                 * If the result code is Activity.RESULT_OK, try to connect
-                 * again
-                 */
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // Try the request again
-                        break;
-                }
-
-        }
     }
 
     /*
@@ -231,12 +209,19 @@ public class BaseActivity extends FragmentActivity implements
                 AccountUtils.startAuthenticationFlow(this, getIntent());
                 return true;
             case R.id.takepic:
-                // create Intent to take a picture and return control to the calling application
+                // create Intent to take a picture and return control to the
+                // calling application
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                // fileUri is public. Use this handle to access the saved image from other classes.
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+                // fileUri is public. Use this handle to access the saved image
+                // from other classes.
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a
+                                                                   // file to
+                                                                   // save the
+                                                                   // image
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
+                                                                   // image file
+                                                                   // name
 
                 // start the image capture Intent
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
@@ -248,8 +233,19 @@ public class BaseActivity extends FragmentActivity implements
 
     }
 
+    /*
+     * Handle results returned to the FragmentActivity by Google Play services
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Decide what to do based on the original request code
+        if (requestCode == CONNECTION_FAILURE_RESOLUTION_REQUEST) {
+            // If the result code is Activity.RESULT_OK, try to connect again
+            if (resultCode == Activity.RESULT_OK) {
+                // Try the request again
+                return;
+            }
+        }
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
@@ -262,7 +258,6 @@ public class BaseActivity extends FragmentActivity implements
                 Toast.makeText(this, "Image capture failed", Toast.LENGTH_LONG).show();
             }
         }
-
         if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Video captured and saved to fileUri specified in the Intent

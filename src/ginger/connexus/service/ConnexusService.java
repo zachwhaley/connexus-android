@@ -6,8 +6,7 @@ import com.octo.android.robospice.retrofit.RetrofitGsonSpiceService;
 
 public class ConnexusService extends RetrofitGsonSpiceService {
 
-    // TODO Get Connexus API url
-    private final static String BASE_URL = "https://connexus.com/api";
+    private final static String BASE_URL = "http://apt-connexus.appspot.com";
 
     @Override
     protected String getServerUrl() {

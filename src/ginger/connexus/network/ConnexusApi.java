@@ -3,31 +3,30 @@ package ginger.connexus.network;
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.model.ConnexusStream;
 import retrofit.http.GET;
+import retrofit.http.POST;
+import retrofit.http.Query;
 
 /**
  * Connexus REST API as Java Interface
- *
+ * 
  * @author zwhaley
  */
 public interface ConnexusApi {
 
-    @GET("")
-    // TODO API call
+    @GET("/AllStreamsServletAPI")
     ConnexusStream.List allStreams();
 
-    @GET("")
-    // TODO API call
-    ConnexusStream.List userStreams();
-
-    @GET("")
-    // TODO API call
+    // TEMP
+    @GET("/AllStreamsServletAPI")
     ConnexusStream.List subscribedStreams();
 
-    @GET("")
-    // TODO API call
-    ConnexusStream.List nearbyStreams();
+    // TEMP
+    @GET("/AllStreamsServletAPI")
+    ConnexusStream.List nearbyStreams(double latitude, double longitude);
 
-    @GET("")
-    // TODO API call
-    ConnexusImage.List streamImages();
+    @GET("/SingleStreamServletAPI")
+    ConnexusImage.List streamImages(@Query("streamId") long streamId);
+
+    @POST("/UploadServletAPI")
+    void uploadImage();
 }

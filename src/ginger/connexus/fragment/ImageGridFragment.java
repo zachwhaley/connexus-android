@@ -16,15 +16,22 @@
 
 package ginger.connexus.fragment;
 
+import ginger.connexus.activity.ImageDetailActivity;
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.network.RequestStreamImages;
-import ginger.connexus.util.Images;
+import ginger.connexus.util.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -41,6 +48,8 @@ public class ImageGridFragment extends GridFragment {
 
     private static final String TAG = ImageGridFragment.class.toString();
 
+    public static final String STREAM_ID = "stream_id";
+
     private RequestStreamImages mImageRequest;
 
     /**
@@ -49,9 +58,11 @@ public class ImageGridFragment extends GridFragment {
     public ImageGridFragment() {
     }
 
-    public static ImageGridFragment newInstance(final Intent intent, Bundle arguments) {
+    public static ImageGridFragment newInstance(final Intent intent, long streamId) {
         ImageGridFragment fragment = new ImageGridFragment();
+        Bundle arguments = new Bundle();
         arguments.putParcelable(FORWARD_INTENT, intent);
+        arguments.putLong(STREAM_ID, streamId);
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -64,28 +75,45 @@ public class ImageGridFragment extends GridFragment {
 
     private void reloadFromArguments(Bundle arguments) {
         mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
+        long streamId = arguments.getLong(STREAM_ID);
 
-        mImageRequest = new RequestStreamImages();
-
-        // TODO temporary
-        reloadImages(Arrays.asList(Images.imageThumbUrls));
-
-        // getSpiceManager().execute(mImageRequest, new
-        // ConnexusImageRequestListener());
+        mImageRequest = new RequestStreamImages(streamId);
+        getSpiceManager().execute(mImageRequest, new ConnexusImageRequestListener());
     }
 
-    public final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        mIntent.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
+        String[] imageUrls = new String[mAdapter.getCount()];
+        for (int i = 0; i < imageUrls.length; ++i) {
+            imageUrls[i] = mAdapter.getItem(i);
+        }
+        mIntent.putExtra(ImageDetailActivity.EXTRA_IMAGE_URLS, imageUrls);
+        if (Utils.hasJellyBean()) {
+            // makeThumbnailScaleUpAnimation() looks kind of ugly here as the
+            // loading spinner may show plus the thumbnail image in GridView is
+            // cropped. so using makeScaleUpAnimation() instead.
+            ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getWidth(), v.getHeight());
+            getActivity().startActivity(mIntent, options.toBundle());
+        } else {
+            startActivity(mIntent);
+        }
+    }
+
+    private final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            // TODO failure
+            Log.w(TAG, "onRequestFailure: " + spiceException.toString());
+            Toast.makeText(getActivity(), "Error occured:" + spiceException.toString(), Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onRequestSuccess(final ConnexusImage.List result) {
             ArrayList<String> imageUrls = new ArrayList<String>(result.size());
             for (ConnexusImage image : result) {
-                imageUrls.add(image.link);
+                imageUrls.add(image.getUrl());
             }
             ImageGridFragment.this.reloadImages(imageUrls);
         }

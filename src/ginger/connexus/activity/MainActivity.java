@@ -1,7 +1,6 @@
 package ginger.connexus.activity;
 
 import ginger.connexus.R;
-import ginger.connexus.fragment.GridFragment;
 import ginger.connexus.fragment.StreamGridFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -64,14 +63,14 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             Intent intent = new Intent(MainActivity.this, ImageGridActivity.class);
             Bundle arguments = new Bundle();
-            arguments.putInt(GridFragment.REQUEST, position);
-            arguments.putParcelable(GridFragment.LOCATION, getLocation());
+            arguments.putInt(StreamGridFragment.REQUEST, position);
+            arguments.putParcelable(StreamGridFragment.LOCATION, getLocation());
             return StreamGridFragment.newInstance(intent, arguments);
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
         @Override
@@ -81,8 +80,6 @@ public class MainActivity extends BaseActivity {
                     return getString(R.string.title_all);
                 case StreamGridFragment.REQUEST_SUBSCRIBED:
                     return getString(R.string.title_subscriptions);
-                case StreamGridFragment.REQUEST_USER:
-                    return getString(R.string.title_mine);
                 case StreamGridFragment.REQUEST_NEARBY:
                     return getString(R.string.title_nearby);
             }

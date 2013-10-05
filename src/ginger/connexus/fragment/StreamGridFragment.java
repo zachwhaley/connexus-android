@@ -1,20 +1,21 @@
 package ginger.connexus.fragment;
 
 import ginger.connexus.BuildConfig;
+import ginger.connexus.activity.ImageGridActivity;
 import ginger.connexus.model.ConnexusStream;
 import ginger.connexus.network.ConnexusApi;
 import ginger.connexus.network.RequestAllStreams;
 import ginger.connexus.network.RequestNearbyStreams;
 import ginger.connexus.network.RequestSubscribedStreams;
-import ginger.connexus.network.RequestUserStreams;
-import ginger.connexus.util.Images;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -25,12 +26,14 @@ public class StreamGridFragment extends GridFragment {
 
     private static final String TAG = StreamGridFragment.class.toString();
 
+    public static final String REQUEST = "request";
+    public static final String LOCATION = "location";
     public static final int REQUEST_ALL = 0;
     public static final int REQUEST_SUBSCRIBED = 1;
-    public static final int REQUEST_USER = 2;
-    public static final int REQUEST_NEARBY = 3;
+    public static final int REQUEST_NEARBY = 2;
 
     private RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> mStreamRequest;
+    private ConnexusStream.List streams;
 
     /**
      * Empty constructor as per the Fragment documentation
@@ -58,46 +61,49 @@ public class StreamGridFragment extends GridFragment {
             case REQUEST_ALL:
                 mStreamRequest = new RequestAllStreams();
                 break;
-            case REQUEST_SUBSCRIBED: {
+            case REQUEST_SUBSCRIBED:
                 mStreamRequest = new RequestSubscribedStreams();
                 break;
-            }
-            case REQUEST_USER: {
-                mStreamRequest = new RequestUserStreams();
-                break;
-            }
             case REQUEST_NEARBY:
                 Location location = (Location) arguments.getParcelable(LOCATION);
-                // TODO Remove
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
                 if (BuildConfig.DEBUG) {
-                    double lat = location.getLatitude();
-                    double lon = location.getLongitude();
                     Toast.makeText(getActivity(), "Latitude " + lat + " Longitude " + lon, Toast.LENGTH_LONG).show();
                 }
-                mStreamRequest = new RequestNearbyStreams();
+                mStreamRequest = new RequestNearbyStreams(lat, lon);
                 break;
             default:
                 throw new UnsupportedOperationException(TAG);
         }
 
-        // TODO temporary
-        reloadImages(Arrays.asList(Images.imageThumbUrls));
-        // getSpiceManager().execute(mStreamRequest, new
-        // ConnexusStreamRequestListener());
+        getSpiceManager().execute(mStreamRequest, new ConnexusStreamRequestListener());
     }
 
-    public final class ConnexusStreamRequestListener implements RequestListener<ConnexusStream.List> {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        Log.i(TAG, "onItemClick position " + position);
+        Log.i(TAG, "onItemClick id " + id);
+        final long streamId = streams.get(position).getId();
+        Log.i(TAG, "GET stream " + streamId);
+        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM, streamId);
+        startActivity(mIntent);
+    }
+
+    private final class ConnexusStreamRequestListener implements RequestListener<ConnexusStream.List> {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            // TODO failure
+            Log.w(TAG, "onRequestFailure: " + spiceException.toString());
+            Toast.makeText(getActivity(), "Error occured:" + spiceException.toString(), Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onRequestSuccess(final ConnexusStream.List result) {
+            streams = result;
             ArrayList<String> imageUrls = new ArrayList<String>(result.size());
             for (ConnexusStream stream : result) {
-                imageUrls.add(stream.cover);
+                imageUrls.add(stream.getCoverUrl());
             }
             StreamGridFragment.this.reloadImages(imageUrls);
         }

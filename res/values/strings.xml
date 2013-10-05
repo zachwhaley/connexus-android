@@ -19,7 +19,7 @@
 
     <string name="app_name">Connexus</string>
     <string name="app_description">Image sharing application</string>
-    <string name="clear_cache_menu">Clear Caches</string>
+    <string name="logout_menu">Logout</string>
     <string name="clear_cache_complete_toast">Caches have been cleared</string>
     <string name="imageview_description">Image Thumbnail</string>
     <string name="no_network_connection_toast">No network connection found</string>

@@ -37,7 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
-import android.widget.Toast;
 
 public class ImageDetailActivity extends BaseActivity implements OnClickListener {
     private static final String IMAGE_CACHE_DIR = "images";
@@ -149,11 +148,6 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
         switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
-                return true;
-            case R.id.clear_cache:
-                mImageFetcher.clearCache();
-                Toast.makeText(
-                        this, R.string.clear_cache_complete_toast, Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);

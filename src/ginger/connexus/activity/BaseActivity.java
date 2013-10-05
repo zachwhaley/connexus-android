@@ -1,5 +1,6 @@
 package ginger.connexus.activity;
 
+import ginger.connexus.R;
 import ginger.connexus.util.AccountUtils;
 import android.app.Activity;
 import android.app.Dialog;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -162,6 +164,16 @@ public class BaseActivity extends FragmentActivity implements
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             return mDialog;
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.logout:
+        	AccountUtils.signOut(this);
+        	AccountUtils.startAuthenticationFlow(this, getIntent());
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

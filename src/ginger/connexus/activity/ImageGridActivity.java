@@ -28,7 +28,10 @@ import android.support.v4.app.FragmentTransaction;
  * much else.
  */
 public class ImageGridActivity extends BaseActivity {
+
     private static final String TAG = "ImageGridActivity";
+
+    public static final String EXTRA_STREAM = "extra_stream";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +43,8 @@ public class ImageGridActivity extends BaseActivity {
         if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             Intent intent = new Intent(this, ImageDetailActivity.class);
-            ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, new Bundle()), TAG);
+            final long streamId = getIntent().getLongExtra(EXTRA_STREAM, -1L);
+            ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, streamId), TAG);
             ft.commit();
         }
     }

@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
         @Override
@@ -81,8 +81,6 @@ public class MainActivity extends BaseActivity {
                     return getString(R.string.title_all);
                 case StreamGridFragment.REQUEST_SUBSCRIBED:
                     return getString(R.string.title_subscriptions);
-                case StreamGridFragment.REQUEST_USER:
-                    return getString(R.string.title_mine);
                 case StreamGridFragment.REQUEST_NEARBY:
                     return getString(R.string.title_nearby);
             }

@@ -21,9 +21,11 @@ import ginger.connexus.R;
 import ginger.connexus.fragment.ImageDetailFragment;
 import ginger.connexus.util.ImageCache;
 import ginger.connexus.util.ImageFetcher;
-import ginger.connexus.util.Images;
 import ginger.connexus.util.Utils;
-import android.annotation.TargetApi;
+
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -39,14 +41,18 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 
 public class ImageDetailActivity extends BaseActivity implements OnClickListener {
+
+    @SuppressWarnings("unused")
+    private static final String TAG = ImageDetailActivity.class.toString();
     private static final String IMAGE_CACHE_DIR = "images";
+
     public static final String EXTRA_IMAGE = "extra_image";
+    public static final String EXTRA_IMAGE_URLS = "extra_image_urls";
 
     private ImagePagerAdapter mAdapter;
     private ImageFetcher mImageFetcher;
     private ViewPager mPager;
 
-    @TargetApi(11)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (BuildConfig.DEBUG) {
@@ -81,7 +87,8 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
         mImageFetcher.setImageFadeIn(false);
 
         // Set up ViewPager and backing adapter
-        mAdapter = new ImagePagerAdapter(getSupportFragmentManager(), Images.imageUrls.length);
+        final List<String> imageUrls = Arrays.asList(getIntent().getStringArrayExtra(EXTRA_IMAGE_URLS));
+        mAdapter = new ImagePagerAdapter(getSupportFragmentManager(), imageUrls);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.setPageMargin((int) getResources().getDimension(R.dimen.image_detail_pager_margin));
@@ -174,21 +181,22 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
      * create/destroy them on the fly.
      */
     private class ImagePagerAdapter extends FragmentStatePagerAdapter {
-        private final int mSize;
 
-        public ImagePagerAdapter(FragmentManager fm, int size) {
+        private final List<String> mImageUrls;
+
+        public ImagePagerAdapter(FragmentManager fm, List<String> imageUrls) {
             super(fm);
-            mSize = size;
+            mImageUrls = imageUrls;
         }
 
         @Override
         public int getCount() {
-            return mSize;
+            return mImageUrls.size();
         }
 
         @Override
         public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(Images.imageUrls[position]);
+            return ImageDetailFragment.newInstance(mImageUrls.get(position));
         }
     }
 
@@ -196,7 +204,6 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
      * Set on the ImageView in the ViewPager children fragments, to
      * enable/disable low profile mode when the ImageView is touched.
      */
-    @TargetApi(11)
     @Override
     public void onClick(View v) {
         final int vis = mPager.getSystemUiVisibility();
@@ -206,4 +213,5 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
             mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
+
 }

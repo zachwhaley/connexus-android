@@ -2,17 +2,13 @@ package ginger.connexus.fragment;
 
 import ginger.connexus.BuildConfig;
 import ginger.connexus.R;
-import ginger.connexus.activity.ImageDetailActivity;
 import ginger.connexus.adapter.ImageAdapter;
 import ginger.connexus.util.ImageCache.ImageCacheParams;
 import ginger.connexus.util.ImageFetcher;
-import ginger.connexus.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.TargetApi;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +31,7 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
     public static final String REQUEST = "request";
     public static final String LOCATION = "location";
     public static final String FORWARD_INTENT = "fwd_intent";
+    public static final String STREAM_ID = "stream_id";
 
     private int mImageThumbSize;
     private int mImageThumbSpacing;
@@ -143,21 +140,6 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
     public void onDestroy() {
         super.onDestroy();
         mImageFetcher.closeCache();
-    }
-
-    @TargetApi(16)
-    @Override
-    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        mIntent.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
-        if (Utils.hasJellyBean()) {
-            // makeThumbnailScaleUpAnimation() looks kind of ugly here as the
-            // loading spinner may show plus the thumbnail image in GridView is
-            // cropped. so using makeScaleUpAnimation() instead.
-            ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getWidth(), v.getHeight());
-            getActivity().startActivity(mIntent, options.toBundle());
-        } else {
-            startActivity(mIntent);
-        }
     }
 
     @Override

@@ -33,8 +33,8 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
     private static final String IMAGE_CACHE_DIR = "thumbs";
 
     public static final String REQUEST = "request";
+    public static final String LOCATION = "location";
     public static final String FORWARD_INTENT = "fwd_intent";
-    public static final String USER = "user";
 
     private int mImageThumbSize;
     private int mImageThumbSpacing;
@@ -99,11 +99,9 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
         });
 
         // This listener is used to get the final width of the GridView and then
-        // calculate the
-        // number of columns and the width of each column. The width of each
-        // column is variable
-        // as the GridView has stretchMode=columnWidth. The column width is used
-        // to set the height
+        // calculate the number of columns and the width of each column. The
+        // width of each column is variable as the GridView has
+        // stretchMode=columnWidth. The column width is used to set the height
         // of each view so we get nice square thumbnails.
         mGridView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -125,14 +123,6 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
 
         return v;
     }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        reloadFromArguments(getArguments());
-    }
-
-    protected abstract void reloadFromArguments(Bundle arguments);
 
     @Override
     public void onResume() {
@@ -161,9 +151,8 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
         mIntent.putExtra(ImageDetailActivity.EXTRA_IMAGE, (int) id);
         if (Utils.hasJellyBean()) {
             // makeThumbnailScaleUpAnimation() looks kind of ugly here as the
-            // loading spinner may
-            // show plus the thumbnail image in GridView is cropped. so using
-            // makeScaleUpAnimation() instead.
+            // loading spinner may show plus the thumbnail image in GridView is
+            // cropped. so using makeScaleUpAnimation() instead.
             ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getWidth(), v.getHeight());
             getActivity().startActivity(mIntent, options.toBundle());
         } else {

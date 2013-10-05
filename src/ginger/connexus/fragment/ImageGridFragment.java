@@ -57,7 +57,12 @@ public class ImageGridFragment extends GridFragment {
     }
 
     @Override
-    protected void reloadFromArguments(Bundle arguments) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        reloadFromArguments(getArguments());
+    }
+
+    private void reloadFromArguments(Bundle arguments) {
         mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
 
         mImageRequest = new RequestStreamImages();
@@ -82,7 +87,7 @@ public class ImageGridFragment extends GridFragment {
             for (ConnexusImage image : result) {
                 imageUrls.add(image.link);
             }
-            reloadImages(imageUrls);
+            ImageGridFragment.this.reloadImages(imageUrls);
         }
     }
 

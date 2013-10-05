@@ -4,15 +4,15 @@ import java.util.ArrayList;
 
 public class ConnexusImage {
 
-	String id;
-	public String link;
+    String id;
+    public String link;
 
-	public String getUrl() {
-		return link;
-	}
+    public String getUrl() {
+        return link;
+    }
 
-	@SuppressWarnings("serial")
-	public static class List extends ArrayList<ConnexusImage> {
-	}
+    @SuppressWarnings("serial")
+    public static class List extends ArrayList<ConnexusImage> {
+    }
 
 }

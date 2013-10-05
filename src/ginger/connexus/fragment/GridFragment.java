@@ -28,10 +28,7 @@ public abstract class GridFragment extends SpiceFragment implements AdapterView.
     private static final String TAG = GridFragment.class.toString();
     private static final String IMAGE_CACHE_DIR = "thumbs";
 
-    public static final String REQUEST = "request";
-    public static final String LOCATION = "location";
     public static final String FORWARD_INTENT = "fwd_intent";
-    public static final String STREAM_ID = "stream_id";
 
     private int mImageThumbSize;
     private int mImageThumbSpacing;

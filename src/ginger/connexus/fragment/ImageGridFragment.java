@@ -48,6 +48,8 @@ public class ImageGridFragment extends GridFragment {
 
     private static final String TAG = ImageGridFragment.class.toString();
 
+    public static final String STREAM_ID = "stream_id";
+
     private RequestStreamImages mImageRequest;
 
     /**

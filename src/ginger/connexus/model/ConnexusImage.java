@@ -10,6 +10,8 @@ public class ConnexusImage {
     String comments;
     String bkUrl;
     Date createDate;
+    double latitude;
+    double longitude;
 
     public String getUrl() {
         return bkUrl;

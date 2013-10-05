@@ -26,6 +26,8 @@ public class StreamGridFragment extends GridFragment {
 
     private static final String TAG = StreamGridFragment.class.toString();
 
+    public static final String REQUEST = "request";
+    public static final String LOCATION = "location";
     public static final int REQUEST_ALL = 0;
     public static final int REQUEST_SUBSCRIBED = 1;
     public static final int REQUEST_NEARBY = 2;
@@ -80,8 +82,11 @@ public class StreamGridFragment extends GridFragment {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        id = streams.get(position).getId();
-        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM, id);
+        Log.i(TAG, "onItemClick position " + position);
+        Log.i(TAG, "onItemClick id " + id);
+        final long streamId = streams.get(position).getId();
+        Log.i(TAG, "GET stream " + streamId);
+        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM, streamId);
         startActivity(mIntent);
     }
 

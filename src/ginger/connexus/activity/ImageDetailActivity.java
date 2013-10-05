@@ -37,7 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
-import android.widget.Toast;
 
 public class ImageDetailActivity extends BaseActivity implements OnClickListener {
     private static final String IMAGE_CACHE_DIR = "images";
@@ -56,25 +55,27 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_detail_pager);
 
-        // Fetch screen height and width, to use as our max size when loading images as this
+        // Fetch screen height and width, to use as our max size when loading
+        // images as this
         // activity runs full screen
         final DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         final int height = displayMetrics.heightPixels;
         final int width = displayMetrics.widthPixels;
 
-        // For this sample we'll use half of the longest width to resize our images. As the
-        // image scaling ensures the image is larger than this, we should be left with a
-        // resolution that is appropriate for both portrait and landscape. For best image quality
-        // we shouldn't divide by 2, but this will use more memory and require a larger memory
-        // cache.
+        // For this sample we'll use half of the longest width to resize our
+        // images. As the image scaling ensures the image is larger than this,
+        // we should be left with a resolution that is appropriate for both
+        // portrait and landscape. For best image quality we shouldn't divide by
+        // 2, but this will use more memory and require a larger memory cache.
         final int longest = (height > width ? height : width) / 2;
 
-        ImageCache.ImageCacheParams cacheParams =
-                new ImageCache.ImageCacheParams(this, IMAGE_CACHE_DIR);
-        cacheParams.setMemCacheSizePercent(0.25f); // Set memory cache to 25% of app memory
+        ImageCache.ImageCacheParams cacheParams = new ImageCache.ImageCacheParams(this, IMAGE_CACHE_DIR);
+        // Set memory cache to 25% of app memory
+        cacheParams.setMemCacheSizePercent(0.25f);
 
-        // The ImageFetcher takes care of loading images into our ImageView children asynchronously
+        // The ImageFetcher takes care of loading images into our ImageView
+        // children asynchronously
         mImageFetcher = new ImageFetcher(this, longest);
         mImageFetcher.addImageCache(getSupportFragmentManager(), cacheParams);
         mImageFetcher.setImageFadeIn(false);
@@ -89,8 +90,8 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
         // Set up activity to go full screen
         getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
 
-        // Enable some additional newer visibility and ActionBar features to create a more
-        // immersive photo viewing experience
+        // Enable some additional newer visibility and ActionBar features to
+        // create a more immersive photo viewing experience
         if (Utils.hasHoneycomb()) {
             final ActionBar actionBar = getActionBar();
 
@@ -148,11 +149,6 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
-            case R.id.clear_cache:
-                mImageFetcher.clearCache();
-                Toast.makeText(
-                        this, R.string.clear_cache_complete_toast,Toast.LENGTH_SHORT).show();
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -164,16 +160,18 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
     }
 
     /**
-     * Called by the ViewPager child fragments to load images via the one ImageFetcher
+     * Called by the ViewPager child fragments to load images via the one
+     * ImageFetcher
      */
     public ImageFetcher getImageFetcher() {
         return mImageFetcher;
     }
 
     /**
-     * The main adapter that backs the ViewPager. A subclass of FragmentStatePagerAdapter as there
-     * could be a large number of items in the ViewPager and we don't want to retain them all in
-     * memory at once but create/destroy them on the fly.
+     * The main adapter that backs the ViewPager. A subclass of
+     * FragmentStatePagerAdapter as there could be a large number of items in
+     * the ViewPager and we don't want to retain them all in memory at once but
+     * create/destroy them on the fly.
      */
     private class ImagePagerAdapter extends FragmentStatePagerAdapter {
         private final int mSize;
@@ -195,8 +193,8 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
     }
 
     /**
-     * Set on the ImageView in the ViewPager children fragments, to enable/disable low profile mode
-     * when the ImageView is touched.
+     * Set on the ImageView in the ViewPager children fragments, to
+     * enable/disable low profile mode when the ImageView is touched.
      */
     @TargetApi(11)
     @Override

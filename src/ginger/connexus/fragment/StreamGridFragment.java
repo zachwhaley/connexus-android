@@ -31,9 +31,10 @@ public class StreamGridFragment extends GridFragment {
     public static final int REQUEST_ALL = 0;
     public static final int REQUEST_SUBSCRIBED = 1;
     public static final int REQUEST_NEARBY = 2;
+    public static final int REQUEST_SEARCH = 100;
 
     private RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> mStreamRequest;
-    private ConnexusStream.List streams;
+    private ConnexusStream.List mStreams;
 
     /**
      * Empty constructor as per the Fragment documentation
@@ -46,6 +47,10 @@ public class StreamGridFragment extends GridFragment {
         arguments.putParcelable(FORWARD_INTENT, intent);
         fragment.setArguments(arguments);
         return fragment;
+    }
+
+    public void setStreams(ConnexusStream.List streams) {
+        this.mStreams = streams;
     }
 
     @Override
@@ -73,20 +78,24 @@ public class StreamGridFragment extends GridFragment {
                 }
                 mStreamRequest = new RequestNearbyStreams(lat, lon);
                 break;
+            case REQUEST_SEARCH:
+                ArrayList<String> imageUrls = new ArrayList<String>(mStreams.size());
+                for (ConnexusStream stream : mStreams) {
+                    imageUrls.add(stream.getCoverUrl());
+                }
+                reloadImages(imageUrls);
+                return;
             default:
                 throw new UnsupportedOperationException(TAG);
         }
-
         getSpiceManager().execute(mStreamRequest, new ConnexusStreamRequestListener());
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        Log.i(TAG, "onItemClick position " + position);
-        Log.i(TAG, "onItemClick id " + id);
-        final long streamId = streams.get(position).getId();
-        Log.i(TAG, "GET stream " + streamId);
-        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM, streamId);
+        ConnexusStream stream = mStreams.get(position);
+        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM, stream.getId());
+        mIntent.putExtra(ImageGridActivity.EXTRA_STREAM_NAME, stream.getName());
         startActivity(mIntent);
     }
 
@@ -100,7 +109,7 @@ public class StreamGridFragment extends GridFragment {
 
         @Override
         public void onRequestSuccess(final ConnexusStream.List result) {
-            streams = result;
+            mStreams = result;
             ArrayList<String> imageUrls = new ArrayList<String>(result.size());
             for (ConnexusStream stream : result) {
                 imageUrls.add(stream.getCoverUrl());

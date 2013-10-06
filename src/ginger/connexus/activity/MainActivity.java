@@ -13,10 +13,8 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.SearchView;
-import android.widget.SearchView.OnCloseListener;
-import android.widget.SearchView.OnQueryTextListener;
 
-public class MainActivity extends BaseActivity implements OnQueryTextListener, OnCloseListener {
+public class MainActivity extends BaseActivity {
 
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.toString();
@@ -62,27 +60,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnCloseListener(this);
-
         return true;
-    }
-
-    @Override
-    public boolean onClose() {
-        onSearchRequested();
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String text) {
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String text) {
-        onSearchRequested();
-        return false;
     }
 
     /*

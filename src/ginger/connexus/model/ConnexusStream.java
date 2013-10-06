@@ -26,4 +26,15 @@ public class ConnexusStream {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public boolean isMatch(String query) {
+        boolean match = false;
+        match |= name.toLowerCase().contains(query.toLowerCase());
+        match |= tags.toLowerCase().contains(query.toLowerCase());
+        return match;
+    }
+
 }

@@ -22,7 +22,6 @@ import ginger.connexus.util.Utils;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 
 /**
  * Simple FragmentActivity to hold the main {@link ImageGridFragment} and not
@@ -33,6 +32,7 @@ public class ImageGridActivity extends BaseActivity {
     private static final String TAG = ImageGridActivity.class.toString();
 
     public static final String EXTRA_STREAM = "extra_stream";
+    public static final String EXTRA_STREAM_NAME = "extra_stream_name";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +43,16 @@ public class ImageGridActivity extends BaseActivity {
 
         if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
             Intent intent = new Intent(this, ImageDetailActivity.class);
             final long streamId = getIntent().getLongExtra(EXTRA_STREAM, -1L);
-            Log.i(TAG, "ImageGridActivity extra stream " + streamId);
-            ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, streamId), TAG);
+            final String streamName = getIntent().getStringExtra(EXTRA_STREAM_NAME);
+
+            Bundle arguments = new Bundle();
+            arguments.putLong(ImageGridFragment.STREAM_ID, streamId);
+            arguments.putString(ImageGridFragment.STREAM_NAME, streamName);
+
+            ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, arguments), TAG);
             ft.commit();
         }
     }

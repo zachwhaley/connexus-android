@@ -20,6 +20,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -28,7 +29,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 
-public class BaseActivity extends FragmentActivity implements
+public abstract class BaseActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
 
@@ -89,11 +90,9 @@ public class BaseActivity extends FragmentActivity implements
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
         } else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_" + timeStamp + ".mp4");
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
         } else {
             return null;
         }
@@ -167,13 +166,11 @@ public class BaseActivity extends FragmentActivity implements
             // If Google Play services can provide an error dialog
             if (errorDialog != null) {
                 // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment =
-                        new ErrorDialogFragment();
+                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
                 // Set the dialog in the DialogFragment
                 errorFragment.setDialog(errorDialog);
                 // Show the error dialog in the DialogFragment
-                errorFragment.show(getSupportFragmentManager(),
-                        "Location Updates");
+                errorFragment.show(getSupportFragmentManager(), "Location Updates");
             }
         }
     }
@@ -202,35 +199,37 @@ public class BaseActivity extends FragmentActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.logout:
+            case R.id.action_logout:
                 AccountUtils.signOut(this);
                 AccountUtils.startAuthenticationFlow(this, getIntent());
                 return true;
-            case R.id.takepic:
+            case R.id.action_takepic:
                 // create Intent to take a picture and return control to the
                 // calling application
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                 // fileUri is public. Use this handle to access the saved image
                 // from other classes.
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a
-                                                                   // file to
-                                                                   // save the
-                                                                   // image
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the
-                                                                   // image file
-                                                                   // name
+                // create a file to save the image
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                // set the image file name
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
                 // start the image capture Intent
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     /*

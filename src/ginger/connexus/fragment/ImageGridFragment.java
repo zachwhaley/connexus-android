@@ -49,6 +49,7 @@ public class ImageGridFragment extends GridFragment {
     private static final String TAG = ImageGridFragment.class.toString();
 
     public static final String STREAM_ID = "stream_id";
+    public static final String STREAM_NAME = "stream_name";
 
     private RequestStreamImages mImageRequest;
 
@@ -58,11 +59,9 @@ public class ImageGridFragment extends GridFragment {
     public ImageGridFragment() {
     }
 
-    public static ImageGridFragment newInstance(final Intent intent, long streamId) {
+    public static ImageGridFragment newInstance(final Intent intent, Bundle arguments) {
         ImageGridFragment fragment = new ImageGridFragment();
-        Bundle arguments = new Bundle();
         arguments.putParcelable(FORWARD_INTENT, intent);
-        arguments.putLong(STREAM_ID, streamId);
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -76,6 +75,8 @@ public class ImageGridFragment extends GridFragment {
     private void reloadFromArguments(Bundle arguments) {
         mIntent = (Intent) arguments.getParcelable(FORWARD_INTENT);
         long streamId = arguments.getLong(STREAM_ID);
+        String streamName = arguments.getString(STREAM_NAME);
+        getActivity().getActionBar().setTitle(streamName);
 
         mImageRequest = new RequestStreamImages(streamId);
         getSpiceManager().execute(mImageRequest, new ConnexusImageRequestListener());

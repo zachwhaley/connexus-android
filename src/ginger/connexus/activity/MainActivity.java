@@ -2,14 +2,24 @@ package ginger.connexus.activity;
 
 import ginger.connexus.R;
 import ginger.connexus.fragment.StreamGridFragment;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.SearchView;
+import android.widget.SearchView.OnCloseListener;
+import android.widget.SearchView.OnQueryTextListener;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements OnQueryTextListener, OnCloseListener {
+
+    @SuppressWarnings("unused")
+    private static final String TAG = MainActivity.class.toString();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -38,6 +48,41 @@ public class MainActivity extends BaseActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        // Inflate the options menu from XML
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.stream_menu, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnCloseListener(this);
+
+        return true;
+    }
+
+    @Override
+    public boolean onClose() {
+        onSearchRequested();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String text) {
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String text) {
+        onSearchRequested();
+        return false;
     }
 
     /*

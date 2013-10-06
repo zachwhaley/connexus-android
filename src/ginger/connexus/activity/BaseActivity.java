@@ -204,11 +204,11 @@ public class BaseActivity extends FragmentActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.logout:
+            case R.id.action_logout:
                 AccountUtils.signOut(this);
                 AccountUtils.startAuthenticationFlow(this, getIntent());
                 return true;
-            case R.id.takepic:
+            case R.id.action_takepic:
                 // create Intent to take a picture and return control to the
                 // calling application
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

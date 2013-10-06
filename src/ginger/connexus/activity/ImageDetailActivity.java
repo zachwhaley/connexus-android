@@ -59,7 +59,7 @@ public class ImageDetailActivity extends BaseActivity implements OnClickListener
             Utils.enableStrictMode();
         }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_detail_pager);
+        setContentView(R.layout.pager_image_detail);
 
         // Fetch screen height and width, to use as our max size when loading
         // images as this

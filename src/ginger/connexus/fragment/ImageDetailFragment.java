@@ -41,7 +41,7 @@ public class ImageDetailFragment extends SpiceFragment {
     /**
      * Factory method to generate a new instance of the fragment given an image
      * number.
-     *
+     * 
      * @param imageUrl
      *            The image url to load
      * @return A new instance of ImageDetailFragment with imageNum extras
@@ -77,7 +77,7 @@ public class ImageDetailFragment extends SpiceFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // Inflate and locate the main ImageView
-        final View v = inflater.inflate(R.layout.image_detail_fragment, container, false);
+        final View v = inflater.inflate(R.layout.fragment_image_detail, container, false);
         mImageView = (ImageView) v.findViewById(R.id.imageView);
         return v;
     }

@@ -4,6 +4,7 @@ import json
 import urllib
 
 from google.appengine.api import users
+from google.appengine.api.images import get_serving_url
 from google.appengine.ext import db
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
@@ -32,17 +33,14 @@ class AddStream(webapp2.RequestHandler):
         stream.followers = []
         stream.put()
 
-class UploadImage(webapp2.RequestHandler):
+class GetUploadUrl(webapp2.RequestHandler):
     def get(self):
-        stream_id = self.request.get('stream')
-        latitude = self.request.get('latitude')
-        longitude = self.request.get('longitude')
-        stream = Stream.get_by_id(long(stream_id))
+        upload_url = blobstore.create_upload_url('/api/upload/handler')
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write(upload_url)
 
-        image = Image(parent=stream)
-        image.latitude = latitude
-        image.longitude = longitude
-
+class UploadImage(webapp2.RequestHandler):
+    def post(self):
         upload_url = blobstore.create_upload_url('/api/upload/handler')
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write(upload_url)
@@ -52,11 +50,18 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         upload_files = self.get_uploads('file')
         blob_info = upload_files[0]
         key = blob_info.key()
+
         serving_url = get_serving_url(key)
-        self.response.out.write(get_all())
+        stream_id = self.request.get('stream')
+        latitude = self.request.get('latitude')
+        longitude = self.request.get('longitude')
+        stream = Stream.get_by_id(long(stream_id))
 
-class AddImage(webapp2.RequestHandler):
-
+        image = Image(parent=stream)
+        image.latitude = float(latitude)
+        image.longitude = float(longitude)
+        image.image_url = serving_url
+        image.put()
 
 class Subscribe(webapp2.RequestHandler):
     def post(self):
@@ -83,6 +88,16 @@ class MyStreams(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(streams, cls=DateSkipper))
 
+class StreamImages(webapp2.RequestHandler):
+    def get(self):
+        stream_id = self.request.get('stream')
+        stream = Stream.get_by_id(long(stream_id))
+        query = Image.all()
+        query.ancestor(stream)
+        images = [db.to_dict(image) for image in query.run()]
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(images, cls=DateSkipper))
+
 class DateSkipper(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -90,11 +105,12 @@ class DateSkipper(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj) 
 
 application = webapp2.WSGIApplication([
+    ('/', MainHandler),
     ('/api/addstream', AddStream),
-    ('/api/addimage', AddImage),
     ('/api/allstreams', AllStreams),
     ('/api/mystreams', MyStreams),
+    ('/api/images', StreamImages),
     ('/api/subscribe', Subscribe),
-    ('/api/upload/', UploadImage),
+    ('/api/upload/geturl', UploadImage),
     ('/api/upload/handler', UploadHandler),
 ], debug=True)

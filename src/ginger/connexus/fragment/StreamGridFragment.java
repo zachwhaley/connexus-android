@@ -1,6 +1,5 @@
 package ginger.connexus.fragment;
 
-import ginger.connexus.BuildConfig;
 import ginger.connexus.activity.ImageGridActivity;
 import ginger.connexus.model.ConnexusStream;
 import ginger.connexus.network.ConnexusApi;
@@ -28,6 +27,7 @@ public class StreamGridFragment extends GridFragment {
 
     public static final String REQUEST = "request";
     public static final String LOCATION = "location";
+    public static final String EMAIL = "email";
     public static final int REQUEST_ALL = 0;
     public static final int REQUEST_SUBSCRIBED = 1;
     public static final int REQUEST_NEARBY = 2;
@@ -67,16 +67,16 @@ public class StreamGridFragment extends GridFragment {
                 mStreamRequest = new RequestAllStreams();
                 break;
             case REQUEST_SUBSCRIBED:
-                mStreamRequest = new RequestSubscribedStreams();
+                String email = arguments.getString(EMAIL);
+                Log.i(TAG, "mystreams " + email);
+                mStreamRequest = new RequestSubscribedStreams(email);
                 break;
             case REQUEST_NEARBY:
                 Location location = (Location) arguments.getParcelable(LOCATION);
-                double lat = location.getLatitude();
-                double lon = location.getLongitude();
-                if (BuildConfig.DEBUG) {
-                    Toast.makeText(getActivity(), "Latitude " + lat + " Longitude " + lon, Toast.LENGTH_LONG).show();
-                }
-                mStreamRequest = new RequestNearbyStreams(lat, lon);
+                float lat = (float) location.getLatitude();
+                float lng = (float) location.getLongitude();
+                Log.i(TAG, "lat " + lat + " lng " + lng);
+                mStreamRequest = new RequestNearbyStreams(lat, lng);
                 break;
             case REQUEST_SEARCH:
                 ArrayList<String> imageUrls = new ArrayList<String>(mStreams.size());

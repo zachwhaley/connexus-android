@@ -1,25 +1,19 @@
 package ginger.connexus.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class ConnexusStream {
 
     long id;
     String name;
     String tags;
-    Date createDate;
-    String coverImageUrl;
+    String cover_url;
 
     public ConnexusStream() {
     }
 
-    @SuppressWarnings("serial")
-    public static class List extends ArrayList<ConnexusStream> {
-    }
-
     public String getCoverUrl() {
-        return coverImageUrl;
+        return cover_url;
     }
 
     public long getId() {
@@ -35,6 +29,10 @@ public class ConnexusStream {
         match |= name.toLowerCase().contains(query.toLowerCase());
         match |= tags.toLowerCase().contains(query.toLowerCase());
         return match;
+    }
+
+    @SuppressWarnings("serial")
+    public static class List extends ArrayList<ConnexusStream> {
     }
 
 }

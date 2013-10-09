@@ -2,8 +2,13 @@ package ginger.connexus.network;
 
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.model.ConnexusStream;
+import retrofit.http.Field;
+import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -13,20 +18,30 @@ import retrofit.http.Query;
  */
 public interface ConnexusApi {
 
-    @GET("/AllStreamsServletAPI")
+    @GET("/allstreams")
     ConnexusStream.List allStreams();
 
-    // TEMP
-    @GET("/AllStreamsServletAPI")
-    ConnexusStream.List subscribedStreams();
+    @GET("/mystreams")
+    ConnexusStream.List subscribedStreams(@Query("email") String email);
 
-    // TEMP
-    @GET("/AllStreamsServletAPI")
-    ConnexusStream.List nearbyStreams(double latitude, double longitude);
+    @GET("/nearbystreams")
+    ConnexusStream.List nearbyStreams(@Query("latitude") float latitude, @Query("longitude") float longitude);
 
-    @GET("/SingleStreamServletAPI")
-    ConnexusImage.List streamImages(@Query("streamId") long streamId);
+    @GET("/images")
+    ConnexusImage.List streamImages(@Query("stream") long streamId);
 
-    @POST("/UploadServletAPI")
-    void uploadImage();
+    @FormUrlEncoded
+    @POST("/subscribe")
+    void subsribe(@Field("email") String email, @Field("stream") long streamId);
+
+    @GET("/upload/geturl")
+    String getUploadUrl();
+
+    @Multipart
+    @POST("/{uploadurl}")
+    void uploadImage(@Path("uploadurl") String uploadurl,
+            @Part("latitude") float latitude,
+            @Part("longitude") float longitude,
+            @Part("stream") long streamId,
+            @Part("image") String imageUri);
 }

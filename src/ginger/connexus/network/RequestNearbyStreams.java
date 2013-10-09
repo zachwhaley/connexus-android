@@ -6,13 +6,13 @@ import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 public class RequestNearbyStreams extends RetrofitSpiceRequest<ConnexusStream.List, ConnexusApi> {
 
-    private final double latitude;
-    private final double longitude;
+    private final float latitude;
+    private final float longitude;
 
-    public RequestNearbyStreams(double lat, double lon) {
+    public RequestNearbyStreams(float lat, float lng) {
         super(ConnexusStream.List.class, ConnexusApi.class);
         this.latitude = lat;
-        this.longitude = lon;
+        this.longitude = lng;
     }
 
     @Override

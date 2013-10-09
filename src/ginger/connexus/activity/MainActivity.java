@@ -2,6 +2,7 @@ package ginger.connexus.activity;
 
 import ginger.connexus.R;
 import ginger.connexus.fragment.StreamGridFragment;
+import ginger.connexus.util.AccountUtils;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -84,10 +85,22 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            Intent intent = new Intent(MainActivity.this, ImageGridActivity.class);
             Bundle arguments = new Bundle();
-            arguments.putInt(StreamGridFragment.REQUEST, position);
-            arguments.putParcelable(StreamGridFragment.LOCATION, getLocation());
+            switch (position) {
+                case StreamGridFragment.REQUEST_ALL:
+                    arguments.putInt(StreamGridFragment.REQUEST, StreamGridFragment.REQUEST_ALL);
+                    break;
+                case StreamGridFragment.REQUEST_SUBSCRIBED:
+                    arguments.putInt(StreamGridFragment.REQUEST, StreamGridFragment.REQUEST_SUBSCRIBED);
+                    final String email = AccountUtils.getChosenAccountName(MainActivity.this);
+                    arguments.putString(StreamGridFragment.EMAIL, email);
+                    break;
+                case StreamGridFragment.REQUEST_NEARBY:
+                    arguments.putInt(StreamGridFragment.REQUEST, StreamGridFragment.REQUEST_NEARBY);
+                    arguments.putParcelable(StreamGridFragment.LOCATION, getLocation());
+                    break;
+            }
+            Intent intent = new Intent(MainActivity.this, ImageGridActivity.class);
             return StreamGridFragment.newInstance(intent, arguments);
         }
 

@@ -2,8 +2,6 @@ package ginger.connexus.network;
 
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.model.ConnexusStream;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
@@ -30,16 +28,9 @@ public interface ConnexusApi {
     @GET("/images")
     ConnexusImage.List streamImages(@Query("stream") long streamId);
 
-    @FormUrlEncoded
-    @POST("/subscribe")
-    void subsribe(@Field("email") String email, @Field("stream") long streamId);
-
-    @GET("/upload/geturl")
-    String getUploadUrl();
-
     @Multipart
     @POST("/{uploadurl}")
-    void uploadImage(@Path("uploadurl") String uploadurl,
+    String uploadImage(@Path("uploadurl") String uploadurl,
             @Part("latitude") float latitude,
             @Part("longitude") float longitude,
             @Part("stream") long streamId,

@@ -14,67 +14,70 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.util.Log;
 
 public class RequestUploadURL {
-	public static String getUploadURL() {
 
-		HttpClient httpclient = new DefaultHttpClient();
+    private static final String TAG = RequestUploadURL.class.toString();
+    private static final String URL = "http://connexus-api.appspot.com/upload/geturl";
 
-		// Prepare a request object
-		String url = "http://connexus-api.appspot.com/upload/geturl";
-		HttpGet httpget = new HttpGet(url);
+    public static String getUploadURL() {
 
-		// Execute the request
-		HttpResponse response;
-		String result = null;
-		try {
-			response = httpclient.execute(httpget);
-			// Examine the response status
-			Log.i("Praeda", response.getStatusLine().toString());
+        HttpClient httpclient = new DefaultHttpClient();
 
-			// Get hold of the response entity
-			HttpEntity entity = response.getEntity();
-			// If the response does not enclose an entity, there is no need
-			// to worry about connection release
+        // Prepare a request object
+        HttpGet httpget = new HttpGet(URL);
 
-			if (entity != null) {
+        // Execute the request
+        HttpResponse response;
+        String result = null;
+        try {
+            response = httpclient.execute(httpget);
+            // Examine the response status
+            Log.i(TAG, response.getStatusLine().toString());
 
-				// A Simple JSON Response Read
-				InputStream instream = entity.getContent();
-				// now you have the string representation of the HTML request
-				result = convertStreamToString(instream);
-				instream.close();
-			}
-		} catch (Exception e) {
-			Log.e("getUrl", "RequestUploadURL failed");
-		}
-		return result;
+            // Get hold of the response entity
+            HttpEntity entity = response.getEntity();
+            // If the response does not enclose an entity, there is no need
+            // to worry about connection release
 
-	}
+            if (entity != null) {
 
-	private static String convertStreamToString(InputStream is) {
-		/*
-		 * To convert the InputStream to String we use the
-		 * BufferedReader.readLine() method. We iterate until the BufferedReader
-		 * return null which means there's no more data to read. Each line will
-		 * appended to a StringBuilder and returned as String.
-		 */
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
+                // A Simple JSON Response Read
+                InputStream instream = entity.getContent();
+                // now you have the string representation of the HTML request
+                result = convertStreamToString(instream);
+                instream.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
+        return result;
 
-		String line = null;
-		try {
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return sb.toString();
-	}
+    }
+
+    private static String convertStreamToString(InputStream is) {
+        /*
+         * To convert the InputStream to String we use the
+         * BufferedReader.readLine() method. We iterate until the BufferedReader
+         * return null which means there's no more data to read. Each line will
+         * appended to a StringBuilder and returned as String.
+         */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
 
 }

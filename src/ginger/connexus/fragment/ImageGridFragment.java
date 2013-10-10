@@ -20,6 +20,8 @@ import ginger.connexus.R;
 import ginger.connexus.activity.ImageDetailActivity;
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.network.RequestStreamImages;
+import ginger.connexus.network.RequestUploadURL;
+import ginger.connexus.network.UploadImage;
 import ginger.connexus.util.Utils;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -159,7 +162,17 @@ public class ImageGridFragment extends GridFragment {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
-                Toast.makeText(getActivity(), "Image saved to " + fileUri.getPath(), Toast.LENGTH_LONG).show();
+                String uploadUrl = RequestUploadURL.getUploadURL();
+                uploadUrl = uploadUrl.substring(32);
+                Log.i(TAG, "Stripped URL" + uploadUrl);
+
+                Location location = (Location) getArguments().getParcelable(StreamGridFragment.LOCATION);
+                // float lat = (float) location.getLatitude();
+                // float lng = (float) location.getLongitude();
+                long streamId = getArguments().getLong(STREAM_ID);
+
+                UploadImage upload = new UploadImage(uploadUrl, 0.0f, 0.0f, streamId, fileUri.getPath());
+                getSpiceManager().execute(upload, new ConnexusImageUploadListener());
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the image capture
                 Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG).show();
@@ -168,6 +181,7 @@ public class ImageGridFragment extends GridFragment {
                 Toast.makeText(getActivity(), "Image capture failed", Toast.LENGTH_LONG).show();
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /** Create a file Uri for saving an image or video */
@@ -181,11 +195,10 @@ public class ImageGridFragment extends GridFragment {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "Connexus");
+        File mediaStorageDir = new File(Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Connexus");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
-
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
@@ -221,6 +234,20 @@ public class ImageGridFragment extends GridFragment {
                 imageUrls.add(image.getUrl());
             }
             ImageGridFragment.this.reloadImages(imageUrls);
+        }
+    }
+
+    private final class ConnexusImageUploadListener implements RequestListener<String> {
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Log.w(TAG, "onRequestFailure: " + spiceException.toString());
+            Toast.makeText(getActivity(), "Error occured:" + spiceException.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestSuccess(final String result) {
+            Log.i(TAG, "Upload worked");
         }
     }
 

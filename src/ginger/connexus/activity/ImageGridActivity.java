@@ -18,6 +18,7 @@ package ginger.connexus.activity;
 
 import ginger.connexus.BuildConfig;
 import ginger.connexus.fragment.ImageGridFragment;
+import ginger.connexus.fragment.StreamGridFragment;
 import ginger.connexus.util.Utils;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,6 +34,15 @@ public class ImageGridActivity extends BaseActivity {
 
     public static final String EXTRA_STREAM = "extra_stream";
     public static final String EXTRA_STREAM_NAME = "extra_stream_name";
+
+    /*
+     * Called when the Activity becomes visible.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startLocationClient();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +61,7 @@ public class ImageGridActivity extends BaseActivity {
             Bundle arguments = new Bundle();
             arguments.putLong(ImageGridFragment.STREAM_ID, streamId);
             arguments.putString(ImageGridFragment.STREAM_NAME, streamName);
+            arguments.putParcelable(StreamGridFragment.LOCATION, getLocation());
 
             ft.add(android.R.id.content, ImageGridFragment.newInstance(intent, arguments), TAG);
             ft.commit();

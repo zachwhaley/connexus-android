@@ -159,7 +159,7 @@ public class ImageGridFragment extends GridFragment {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
-                Toast.makeText(getActivity(), "Image saved", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Image saved to " + fileUri.getPath(), Toast.LENGTH_LONG).show();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the image capture
                 Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG).show();

@@ -16,19 +16,31 @@
 
 package ginger.connexus.fragment;
 
+import ginger.connexus.R;
 import ginger.connexus.activity.ImageDetailActivity;
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.network.RequestStreamImages;
 import ginger.connexus.util.Utils;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -47,11 +59,15 @@ import com.octo.android.robospice.request.listener.RequestListener;
 public class ImageGridFragment extends GridFragment {
 
     private static final String TAG = ImageGridFragment.class.toString();
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
     public static final String STREAM_ID = "stream_id";
     public static final String STREAM_NAME = "stream_name";
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
 
     private RequestStreamImages mImageRequest;
+    private Uri fileUri;
 
     /**
      * Empty constructor as per the Fragment documentation
@@ -64,6 +80,41 @@ public class ImageGridFragment extends GridFragment {
         arguments.putParcelable(FORWARD_INTENT, intent);
         fragment.setArguments(arguments);
         return fragment;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.camera_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_takepic:
+                // create Intent to take a picture and return control to the
+                // calling application
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                // fileUri is public. Use this handle to access the saved image
+                // from other classes.
+                // create a file to save the image
+                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                // set the image file name
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+                // start the image capture Intent
+                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -100,6 +151,59 @@ public class ImageGridFragment extends GridFragment {
         } else {
             startActivity(mIntent);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult");
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                // Image captured and saved to fileUri specified in the Intent
+                Toast.makeText(getActivity(), "Image saved", Toast.LENGTH_LONG).show();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User cancelled the image capture
+                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG).show();
+            } else {
+                // Image capture failed, advise user
+                Toast.makeText(getActivity(), "Image capture failed", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    /** Create a file Uri for saving an image or video */
+    private static Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /** Create a File for saving an image or video */
+    @SuppressLint("SimpleDateFormat")
+    private static File getOutputMediaFile(int type) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "Connexus");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("Connexus", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
     }
 
     private final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {

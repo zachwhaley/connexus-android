@@ -29,12 +29,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -102,7 +104,7 @@ public class ImageGridFragment extends GridFragment {
                 // fileUri is public. Use this handle to access the saved image
                 // from other classes.
                 // create a file to save the image
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+                fileUri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE));
                 // set the image file name
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
@@ -163,16 +165,21 @@ public class ImageGridFragment extends GridFragment {
             if (resultCode == Activity.RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
                 String uploadUrl = RequestUploadURL.getUploadURL();
-                uploadUrl = uploadUrl.substring(32);
-                Log.i(TAG, "Stripped URL" + uploadUrl);
+                Log.i(TAG, "Upload URL: " + uploadUrl);
+                String[] split = uploadUrl.split("upload/");
+                uploadUrl = split[1];
+                Log.i(TAG, "Stripped URL: " + uploadUrl);
 
-                Location location = (Location) getArguments().getParcelable(StreamGridFragment.LOCATION);
-                // float lat = (float) location.getLatitude();
-                // float lng = (float) location.getLongitude();
+                /*
+                 * Location location = (Location)
+                 * getArguments().getParcelable(StreamGridFragment.LOCATION);
+                 * float lat = (float) location.getLatitude(); float lng =
+                 * (float) location.getLongitude();
+                 */
                 long streamId = getArguments().getLong(STREAM_ID);
-
-                UploadImage upload = new UploadImage(uploadUrl, 0.0f, 0.0f, streamId, fileUri.getPath());
-                getSpiceManager().execute(upload, new ConnexusImageUploadListener());
+                File file = new File(fileUri.getPath());
+                UploadCallback cb = new UploadCallback();
+                new UploadImage(uploadUrl, streamId, 0.0f, 0.0f, file, cb).post();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the image capture
                 Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG).show();
@@ -184,9 +191,24 @@ public class ImageGridFragment extends GridFragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
+    private final class UploadCallback implements Callback<ConnexusImage> {
+
+        @Override
+        public void failure(RetrofitError e) {
+            Log.e(TAG, e.getMessage() == null ? "NULL MESSAGE" : e.getMessage());
+            Log.e(TAG, e.getUrl() == null ? "NULL URL" : e.getUrl());
+            Log.e(TAG, e.getResponse().getReason());
+            /*
+             * e.getCause().getMessage()); Log.e(TAG,
+             * e.getStackTrace().toString());
+             */
+            Toast.makeText(getActivity(), "Error occured:" + e.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void success(ConnexusImage image, Response resp) {
+            Toast.makeText(getActivity(), "Upload worked:", Toast.LENGTH_LONG).show();
+        }
     }
 
     /** Create a File for saving an image or video */

@@ -17,6 +17,7 @@
 package ginger.connexus.fragment;
 
 import ginger.connexus.R;
+import ginger.connexus.activity.BaseActivity;
 import ginger.connexus.activity.ImageDetailActivity;
 import ginger.connexus.model.ConnexusImage;
 import ginger.connexus.network.RequestStreamImages;
@@ -37,6 +38,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,6 +72,8 @@ public class ImageGridFragment extends GridFragment {
     public static final String STREAM_NAME = "stream_name";
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    public float lat;
+    public float lng;
 
     private RequestStreamImages mImageRequest;
     private Uri fileUri;
@@ -80,7 +84,8 @@ public class ImageGridFragment extends GridFragment {
     public ImageGridFragment() {
     }
 
-    public static ImageGridFragment newInstance(final Intent intent, Bundle arguments) {
+    public static ImageGridFragment newInstance(final Intent intent,
+            Bundle arguments) {
         ImageGridFragment fragment = new ImageGridFragment();
         arguments.putParcelable(FORWARD_INTENT, intent);
         fragment.setArguments(arguments);
@@ -96,23 +101,29 @@ public class ImageGridFragment extends GridFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_takepic:
-                // create Intent to take a picture and return control to the
-                // calling application
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        case R.id.action_takepic:
+            // create Intent to take a picture and return control to the
+            // calling application
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                // fileUri is public. Use this handle to access the saved image
-                // from other classes.
-                // create a file to save the image
-                fileUri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE));
-                // set the image file name
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+            // fileUri is public. Use this handle to access the saved image
+            // from other classes.
+            // create a file to save the image
+            fileUri = Uri.fromFile(getOutputMediaFile(MEDIA_TYPE_IMAGE));
+            // set the image file name
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
-                // start the image capture Intent
-                startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            // start the image capture Intent
+            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+            
+            // capture current location
+            Location loc = ((BaseActivity) getActivity()).getLocation();
+            lat = (float) loc.getLatitude();
+            lng = (float) loc.getLongitude();
+            
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -135,7 +146,8 @@ public class ImageGridFragment extends GridFragment {
         getActivity().getActionBar().setTitle(streamName);
 
         mImageRequest = new RequestStreamImages(streamId);
-        getSpiceManager().execute(mImageRequest, new ConnexusImageRequestListener());
+        getSpiceManager().execute(mImageRequest,
+                new ConnexusImageRequestListener());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -151,7 +163,8 @@ public class ImageGridFragment extends GridFragment {
             // makeThumbnailScaleUpAnimation() looks kind of ugly here as the
             // loading spinner may show plus the thumbnail image in GridView is
             // cropped. so using makeScaleUpAnimation() instead.
-            ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v, 0, 0, v.getWidth(), v.getHeight());
+            ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,
+                    0, 0, v.getWidth(), v.getHeight());
             getActivity().startActivity(mIntent, options.toBundle());
         } else {
             startActivity(mIntent);
@@ -170,22 +183,19 @@ public class ImageGridFragment extends GridFragment {
                 uploadUrl = split[1];
                 Log.i(TAG, "Stripped URL: " + uploadUrl);
 
-                /*
-                 * Location location = (Location)
-                 * getArguments().getParcelable(StreamGridFragment.LOCATION);
-                 * float lat = (float) location.getLatitude(); float lng =
-                 * (float) location.getLongitude();
-                 */
                 long streamId = getArguments().getLong(STREAM_ID);
                 File file = new File(fileUri.getPath());
                 UploadCallback cb = new UploadCallback();
-                new UploadImage(uploadUrl, streamId, 0.0f, 0.0f, file, cb).post();
+                new UploadImage(uploadUrl, streamId, lat, lng, file, cb)
+                        .post();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the image capture
-                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_LONG)
+                        .show();
             } else {
                 // Image capture failed, advise user
-                Toast.makeText(getActivity(), "Image capture failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Image capture failed",
+                        Toast.LENGTH_LONG).show();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -202,12 +212,14 @@ public class ImageGridFragment extends GridFragment {
              * e.getCause().getMessage()); Log.e(TAG,
              * e.getStackTrace().toString());
              */
-            Toast.makeText(getActivity(), "Error occured:" + e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Error occured:" + e.toString(),
+                    Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void success(ConnexusImage image, Response resp) {
-            Toast.makeText(getActivity(), "Upload worked:", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Upload worked:", Toast.LENGTH_LONG)
+                    .show();
         }
     }
 
@@ -217,8 +229,10 @@ public class ImageGridFragment extends GridFragment {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Connexus");
+        File mediaStorageDir = new File(
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "Connexus");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
         // Create the storage directory if it does not exist
@@ -230,10 +244,12 @@ public class ImageGridFragment extends GridFragment {
         }
 
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                    + "IMG_" + timeStamp + ".jpg");
         } else {
             return null;
         }
@@ -241,12 +257,15 @@ public class ImageGridFragment extends GridFragment {
         return mediaFile;
     }
 
-    private final class ConnexusImageRequestListener implements RequestListener<ConnexusImage.List> {
+    private final class ConnexusImageRequestListener implements
+            RequestListener<ConnexusImage.List> {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Log.w(TAG, "onRequestFailure: " + spiceException.toString());
-            Toast.makeText(getActivity(), "Error occured:" + spiceException.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),
+                    "Error occured:" + spiceException.toString(),
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -259,12 +278,15 @@ public class ImageGridFragment extends GridFragment {
         }
     }
 
-    private final class ConnexusImageUploadListener implements RequestListener<String> {
+    private final class ConnexusImageUploadListener implements
+            RequestListener<String> {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Log.w(TAG, "onRequestFailure: " + spiceException.toString());
-            Toast.makeText(getActivity(), "Error occured:" + spiceException.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),
+                    "Error occured:" + spiceException.toString(),
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override

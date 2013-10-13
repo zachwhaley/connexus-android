@@ -41,7 +41,7 @@ public abstract class BaseActivity extends FragmentActivity implements
         mLocationClient.disconnect();
     }
 
-    protected Location getLocation() {
+    public Location getLocation() {
         return mConnected ? mLocationClient.getLastLocation() : null;
     }
 

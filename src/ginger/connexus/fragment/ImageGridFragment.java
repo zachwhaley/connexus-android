@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 Zach Whaley, Trevor Latson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,12 +115,12 @@ public class ImageGridFragment extends GridFragment {
 
             // start the image capture Intent
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-            
+
             // capture current location
             Location loc = ((BaseActivity) getActivity()).getLocation();
             lat = (float) loc.getLatitude();
             lng = (float) loc.getLongitude();
-            
+
             return true;
         default:
             return super.onOptionsItemSelected(item);

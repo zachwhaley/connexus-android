@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 Zach Whaley, Trevor Latson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class ImageDetailFragment extends SpiceFragment {
     /**
      * Factory method to generate a new instance of the fragment given an image
      * number.
-     * 
+     *
      * @param imageUrl
      *            The image url to load
      * @return A new instance of ImageDetailFragment with imageNum extras
